@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Bond Holdings - Financial Management{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Summary -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">Total Holdings</dt>
+            <dd class="text-2xl font-semibold text-gray-900">{{ holdings|length }} bonds</dd>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">Total Face Value</dt>
+            <dd class="text-2xl font-semibold text-gray-900">${{ "{:,.0f}".format(total_face_value) }}</dd>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">Annual Income</dt>
+            <dd class="text-2xl font-semibold text-gray-900">${{ "{:,.2f}".format(total_annual_income) }}</dd>
+        </div>
+    </div>
+
+    <!-- Holdings Table -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6 border-b">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Bond Holdings</h3>
+            <p class="mt-1 text-sm text-gray-500">Sorted by maturity date</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CUSIP</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issuer</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Coupon</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Maturity</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Face Value</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Annual Income</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Account</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pays</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% set month_abbr = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+                    {% for h in holdings %}
+                    {% set annual_income = h.face_value * h.coupon_rate %}
+                    {% set days_to_maturity = (h.maturity_date - now.date()).days %}
+                    <tr class="{% if days_to_maturity < 180 %}bg-yellow-50{% elif days_to_maturity < 365 %}bg-orange-50{% endif %}">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">{{ h.cusip }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="{{ h.issuer }}">{{ h.issuer[:30] }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">{{ "{:.2f}".format(h.coupon_rate * 100) }}%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            {{ h.maturity_date.strftime('%Y-%m-%d') }}
+                            {% if days_to_maturity < 180 %}
+                            <span class="ml-1 text-yellow-600 text-xs">({{ days_to_maturity }}d)</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">${{ "{:,.0f}".format(h.face_value) }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">${{ "{:,.2f}".format(annual_income) }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{{ h.account[:15] }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            {{ month_abbr[h.payment_month_1] }}/{{ month_abbr[h.payment_month_2] }}
+                            {% if not h.payment_verified %}<span class="text-yellow-500">?</span>{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

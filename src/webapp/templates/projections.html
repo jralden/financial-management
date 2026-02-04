@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block title %}Monthly Projections - Financial Management{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <!-- Summary -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">12-Month Coupon Income</dt>
+            <dd class="text-2xl font-semibold text-gray-900">${{ "{:,.2f}".format(projections[:12]|sum(attribute='coupon_income')) }}</dd>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">12-Month Maturities</dt>
+            <dd class="text-2xl font-semibold text-yellow-600">${{ "{:,.2f}".format(projections[:12]|sum(attribute='maturities')) }}</dd>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">12-Month Total Cash</dt>
+            <dd class="text-2xl font-semibold text-green-600">${{ "{:,.2f}".format(projections[:12]|sum(attribute='total_cash')) }}</dd>
+        </div>
+    </div>
+
+    <!-- Projections Table -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6 border-b">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Monthly Cash Flow Projection</h3>
+            <p class="mt-1 text-sm text-gray-500">Expected cash from coupons and bond maturities</p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Month</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Coupon Income</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Maturities</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Cash</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Visual</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% set max_cash = projections|map(attribute='total_cash')|max %}
+                    {% for proj in projections %}
+                    <tr class="{% if proj.maturities > 0 %}bg-yellow-50{% endif %}">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                            {{ month_names[proj.month] }} {{ proj.year }}
+                            {% if proj.maturities > 0 %}<span class="ml-2 text-yellow-600">●</span>{% endif %}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                            ${{ "{:,.2f}".format(proj.coupon_income) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right {% if proj.maturities > 0 %}font-medium text-yellow-600{% else %}text-gray-400{% endif %}">
+                            ${{ "{:,.2f}".format(proj.maturities) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-gray-900">
+                            ${{ "{:,.2f}".format(proj.total_cash) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            {% set bar_width = (proj.total_cash / max_cash * 100)|int if max_cash > 0 else 0 %}
+                            <div class="w-48 bg-gray-200 rounded-full h-4">
+                                <div class="h-4 rounded-full {% if proj.maturities > 0 %}bg-yellow-400{% else %}bg-blue-500{% endif %}" style="width: {{ bar_width }}%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot class="bg-gray-100">
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">TOTAL</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">
+                            ${{ "{:,.2f}".format(projections|sum(attribute='coupon_income')) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-yellow-600">
+                            ${{ "{:,.2f}".format(projections|sum(attribute='maturities')) }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-green-600">
+                            ${{ "{:,.2f}".format(projections|sum(attribute='total_cash')) }}
+                        </td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

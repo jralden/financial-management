@@ -1,0 +1,39 @@
+# Virtual environment
+.venv/
+
+# Environment variables (contains credentials)
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# Playwright
+playwright-state/
+*.png
+*.pdf
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# macOS
+.DS_Store
+
+# Session data
+session_state/
+.env.railway
+
+# Local data files (scraped/cached)
+financial_management.db
+portfolio_data.json
+portfolio_raw.txt
+positions_raw.txt
+positions_inner_text.txt
