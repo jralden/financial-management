@@ -53,52 +53,5 @@
             </table>
         </div>
     </div>
-
-    <!-- Bond Holdings by Account -->
-    {% for account_name, account_data in bonds_by_account.items() %}
-    <div class="bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:px-6 border-b">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">{{ account_name }} - Bond Holdings</h3>
-            <p class="mt-1 text-sm text-gray-500">
-                {{ account_data.count }} bonds | ${{ "{:,.0f}".format(account_data.face_value) }} face value | ${{ "{:,.2f}".format(account_data.annual_income) }}/year income
-            </p>
-        </div>
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Issuer</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Coupon</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Face Value</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Maturity</th>
-                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Annual Income</th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for bond in account_data.bonds %}
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                            {{ bond.issuer[:40] }}{% if bond.issuer|length > 40 %}...{% endif %}
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ "{:.3f}".format(bond.coupon_rate * 100) }}%</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">${{ "{:,.0f}".format(bond.face_value) }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">{{ bond.maturity_date.strftime('%m/%d/%Y') }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">${{ "{:,.2f}".format(bond.face_value * bond.coupon_rate) }}</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-                <tfoot class="bg-gray-50">
-                    <tr>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900">Total</td>
-                        <td class="px-6 py-4"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">${{ "{:,.0f}".format(account_data.face_value) }}</td>
-                        <td class="px-6 py-4"></td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-bold text-gray-900">${{ "{:,.2f}".format(account_data.annual_income) }}</td>
-                    </tr>
-                </tfoot>
-            </table>
-        </div>
-    </div>
-    {% endfor %}
 </div>
 {% endblock %}
