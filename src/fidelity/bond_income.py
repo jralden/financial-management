@@ -13,6 +13,7 @@ from datetime import datetime, date
 from pathlib import Path
 from typing import Optional
 from collections import defaultdict
+from zoneinfo import ZoneInfo
 from dotenv import load_dotenv
 from playwright.sync_api import sync_playwright, Page
 
@@ -325,8 +326,12 @@ def fetch_bond_holdings(headless: bool = True) -> Optional[tuple[BondPortfolio, 
 
             print(f"\nFound {len(holdings)} bonds")
 
+            # Use NYC timezone for timestamp
+            nyc_tz = ZoneInfo("America/New_York")
+            nyc_now = datetime.now(nyc_tz)
+
             portfolio = BondPortfolio(
-                timestamp=datetime.now().isoformat(),
+                timestamp=nyc_now.strftime("%Y-%m-%dT%H:%M:%S"),
                 holdings=holdings,
                 fetch_time_seconds=time.time() - start_time
             )

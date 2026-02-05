@@ -26,6 +26,7 @@ from src.fidelity.fetch_balances import fetch_balances
 # Cache location - use a standard location for easy access
 CACHE_DIR = Path.home() / ".cache" / "financial-management"
 CACHE_FILE = CACHE_DIR / "fidelity_balances.json"
+BONDS_CACHE_FILE = CACHE_DIR / "bond_holdings.json"
 LOG_FILE = CACHE_DIR / "fetch.log"
 
 # Market hours (Eastern Time)
@@ -60,6 +61,54 @@ def get_market_status() -> str:
         return f"OPEN ({day_name} {time_str})"
     else:
         return f"CLOSED ({day_name} {time_str})"
+
+
+def bonds_fetched_today() -> bool:
+    """Check if bond holdings were already fetched today (NYC time)."""
+    if not BONDS_CACHE_FILE.exists():
+        return False
+
+    try:
+        with open(BONDS_CACHE_FILE) as f:
+            data = json.load(f)
+        timestamp = data.get("timestamp", "")
+        # Parse timestamp (format: YYYY-MM-DDTHH:MM:SS)
+        if not timestamp:
+            return False
+        cache_date = timestamp.split("T")[0]
+        today_nyc = datetime.now(MARKET_TZ).strftime("%Y-%m-%d")
+        return cache_date == today_nyc
+    except Exception:
+        return False
+
+
+def fetch_bonds_if_needed() -> bool:
+    """Fetch bond holdings if not already fetched today. Returns True on success."""
+    if bonds_fetched_today():
+        log("Bonds already fetched today, skipping")
+        return True
+
+    log("Fetching bond holdings (once daily)...")
+    try:
+        from src.fidelity.bond_income import fetch_bond_holdings, save_portfolio
+        result = fetch_bond_holdings(headless=True)
+        if result:
+            portfolio, cash_by_account = result
+            if portfolio.holdings:
+                save_portfolio(portfolio, cash_by_account)
+                log(f"SUCCESS: Cached {len(portfolio.holdings)} bonds")
+                return True
+            else:
+                log("WARNING: No bonds found")
+                return False
+        else:
+            log("ERROR: Bond fetch returned no data")
+            return False
+    except Exception as e:
+        log(f"ERROR fetching bonds: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
 
 
 def log(message: str):
@@ -120,6 +169,9 @@ def fetch_and_cache(force: bool = False) -> bool:
 
         log(f"SUCCESS: Cached {len(summary.accounts)} accounts, total ${summary.total_balance:,.2f}")
         log(f"Fetch time: {summary.fetch_time_seconds:.2f}s")
+
+        # Fetch bond holdings once per business day
+        fetch_bonds_if_needed()
 
         # Sync to Railway if DATABASE_URL is set
         try:
