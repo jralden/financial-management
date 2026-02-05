@@ -1,0 +1,115 @@
+{% extends "base.html" %}
+
+{% block title %}Results - Financial Management{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-900">Monthly Cash Flow Results</h1>
+    </div>
+
+    {% for account_name, account_years in results_by_account.items() %}
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6 border-b bg-gray-50">
+            <h2 class="text-xl font-semibold text-gray-900">{{ account_name }}</h2>
+        </div>
+
+        {% for year in years %}
+        {% set year_data = account_years.get(year, {}) %}
+        {% if year_data %}
+        <div class="border-b last:border-b-0">
+            <div class="px-4 py-3 bg-blue-50 border-b">
+                <h3 class="text-lg font-medium text-blue-900">{{ year }}</h3>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Month</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Coupon Income</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Maturities</th>
+                            <th class="px-4 py-2 text-right text-xs font-medium text-gray-500 uppercase">Total Cash</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        {% for month_data in year_data.months %}
+                        <tr class="{% if month_data.is_historical %}bg-gray-100 text-gray-500{% elif month_data.maturities > 0 %}bg-yellow-50{% endif %}">
+                            <td class="px-4 py-2 whitespace-nowrap text-sm font-medium {% if month_data.is_historical %}text-gray-500{% else %}text-gray-900{% endif %}">
+                                {{ month_data.month_name }}
+                                {% if month_data.maturities > 0 and not month_data.is_historical %}<span class="ml-1 text-yellow-600">●</span>{% endif %}
+                                {% if month_data.is_historical %}<span class="ml-1 text-xs">(past)</span>{% endif %}
+                            </td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-right {% if month_data.is_historical %}text-gray-500{% else %}text-gray-900{% endif %}">
+                                ${{ "{:,.2f}".format(month_data.coupon_income) }}
+                            </td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-right {% if month_data.maturities > 0 and not month_data.is_historical %}font-medium text-yellow-600{% elif month_data.is_historical %}text-gray-500{% else %}text-gray-400{% endif %}">
+                                ${{ "{:,.2f}".format(month_data.maturities) }}
+                            </td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-right font-medium {% if month_data.is_historical %}text-gray-500{% else %}text-gray-900{% endif %}">
+                                ${{ "{:,.2f}".format(month_data.total_cash) }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot class="bg-blue-100">
+                        <tr>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm font-bold text-blue-900">{{ year }} Year End Total</td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-right font-bold text-blue-900">
+                                ${{ "{:,.2f}".format(year_data.total.coupon_income) }}
+                            </td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-right font-bold text-yellow-700">
+                                ${{ "{:,.2f}".format(year_data.total.maturities) }}
+                            </td>
+                            <td class="px-4 py-2 whitespace-nowrap text-sm text-right font-bold text-green-700">
+                                ${{ "{:,.2f}".format(year_data.total.total_cash) }}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+
+    <!-- Grand Totals -->
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6 border-b bg-green-50">
+            <h2 class="text-xl font-semibold text-green-900">All Accounts - Summary by Year</h2>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Year</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Coupon Income</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Maturities</th>
+                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Total Cash</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for year in years %}
+                    {% set year_coupon = 0 %}
+                    {% set year_maturities = 0 %}
+                    {% set year_total = 0 %}
+                    {% for account_name, account_years in results_by_account.items() %}
+                        {% if account_years.get(year) %}
+                            {% set year_coupon = year_coupon + account_years[year].total.coupon_income %}
+                            {% set year_maturities = year_maturities + account_years[year].total.maturities %}
+                            {% set year_total = year_total + account_years[year].total.total_cash %}
+                        {% endif %}
+                    {% endfor %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ year }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">${{ "{:,.2f}".format(year_coupon) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-yellow-600">${{ "{:,.2f}".format(year_maturities) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-green-600">${{ "{:,.2f}".format(year_total) }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

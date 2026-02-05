@@ -22,6 +22,18 @@ from src.database.models import (
     MonthlyProjection, SyncLog
 )
 
+# Account ordering - Joint WROS first, then Mary's IRA, then John's IRA
+ACCOUNT_ORDER = {
+    "Joint WROS - TOD": 0,
+    "Mary's IRA": 1,
+    "John's IRA": 2,
+}
+
+def account_sort_key(item, attr='account_name'):
+    """Sort key function for ordering accounts."""
+    name = getattr(item, attr) if hasattr(item, attr) else item.get(attr, '')
+    return ACCOUNT_ORDER.get(name, 99)
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -104,35 +116,64 @@ class MonthlyProjectionResponse(BaseModel):
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request, db: Session = Depends(get_db)):
     """Main dashboard page."""
-    # Get account balances
-    balances = db.query(AccountBalance).order_by(AccountBalance.account_type).all()
+    # Get account balances sorted in specified order
+    balances = db.query(AccountBalance).all()
+    balances = sorted(balances, key=lambda b: account_sort_key(b, 'account_name'))
     total_balance = sum(b.balance for b in balances)
     total_change = sum(b.daily_change for b in balances)
 
-    # Get bond summary
-    bond_count = db.query(BondHolding).count()
-    total_face_value = db.query(func.sum(BondHolding.face_value)).scalar() or 0
+    # Get bonds grouped by account
+    holdings = db.query(BondHolding).order_by(BondHolding.maturity_date).all()
+    bonds_by_account = {}
+    for account_name in ACCOUNT_ORDER.keys():
+        account_bonds = [h for h in holdings if h.account == account_name]
+        if account_bonds:
+            bonds_by_account[account_name] = {
+                'bonds': account_bonds,
+                'count': len(account_bonds),
+                'face_value': sum(h.face_value for h in account_bonds),
+                'annual_income': sum(h.face_value * h.coupon_rate for h in account_bonds)
+            }
 
-    # Get next 6 months projections
+    # Get next 12 months projections
     today = datetime.now()
     projections = db.query(MonthlyProjection).filter(
         (MonthlyProjection.year > today.year) |
         ((MonthlyProjection.year == today.year) & (MonthlyProjection.month >= today.month))
-    ).order_by(MonthlyProjection.year, MonthlyProjection.month).limit(6).all()
+    ).order_by(MonthlyProjection.year, MonthlyProjection.month).limit(12).all()
+
+    # Calculate next month cash per account (from bond holdings)
+    next_month = today.month + 1 if today.month < 12 else 1
+    next_month_year = today.year if today.month < 12 else today.year + 1
+    next_month_cash_by_account = {}
+    for account_name, data in bonds_by_account.items():
+        account_cash = 0
+        for bond in data['bonds']:
+            # Check for coupon payment
+            if bond.payment_month_1 == next_month or bond.payment_month_2 == next_month:
+                account_cash += (bond.face_value * bond.coupon_rate) / 2
+            # Check for maturity
+            if bond.maturity_date.year == next_month_year and bond.maturity_date.month == next_month:
+                account_cash += bond.face_value
+        next_month_cash_by_account[account_name] = account_cash
 
     # Get last sync
     last_sync = db.query(SyncLog).filter(
         SyncLog.status == 'success'
     ).order_by(SyncLog.completed_at.desc()).first()
 
+    month_names = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                   'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "balances": balances,
         "total_balance": total_balance,
         "total_change": total_change,
-        "bond_count": bond_count,
-        "total_face_value": total_face_value,
+        "bonds_by_account": bonds_by_account,
         "projections": projections,
+        "next_month_cash_by_account": next_month_cash_by_account,
+        "next_month_name": f"{month_names[next_month]} {next_month_year}",
         "last_sync": last_sync,
         "now": datetime.now()
     })
@@ -274,22 +315,99 @@ async def holdings_page(request: Request, db: Session = Depends(get_db)):
     })
 
 
-@app.get("/projections", response_class=HTMLResponse)
-async def projections_page(request: Request, db: Session = Depends(get_db)):
-    """Monthly projections page."""
-    projections = db.query(MonthlyProjection).order_by(
-        MonthlyProjection.year, MonthlyProjection.month
-    ).all()
+@app.get("/results", response_class=HTMLResponse)
+async def results_page(request: Request, db: Session = Depends(get_db)):
+    """Monthly results page - cash flow by account."""
+    today = datetime.now()
+
+    # Get all bond holdings
+    holdings = db.query(BondHolding).all()
 
     month_names = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
-    return templates.TemplateResponse("projections.html", {
+    # Determine year range - current year and next 2 years
+    current_year = today.year
+    years = [current_year, current_year + 1, current_year + 2]
+
+    # Build results by account and month
+    results_by_account = {}
+    for account_name in ACCOUNT_ORDER.keys():
+        account_bonds = [h for h in holdings if h.account == account_name]
+        if not account_bonds:
+            continue
+
+        account_results = {}
+        for year in years:
+            year_data = []
+            year_total = {'coupon_income': 0, 'maturities': 0, 'total_cash': 0}
+
+            for month in range(1, 13):
+                month_income = 0
+                month_maturities = 0
+
+                for bond in account_bonds:
+                    # Check maturity first - if matured, no more payments
+                    bond_matured_before = (
+                        bond.maturity_date.year < year or
+                        (bond.maturity_date.year == year and bond.maturity_date.month < month)
+                    )
+                    if bond_matured_before:
+                        continue
+
+                    # Check for coupon payment this month
+                    if bond.payment_month_1 == month or bond.payment_month_2 == month:
+                        month_income += (bond.face_value * bond.coupon_rate) / 2
+
+                    # Check for maturity this month
+                    if bond.maturity_date.year == year and bond.maturity_date.month == month:
+                        month_maturities += bond.face_value
+
+                total_cash = month_income + month_maturities
+                is_historical = (year < current_year) or (year == current_year and month < today.month)
+
+                year_data.append({
+                    'month': month,
+                    'month_name': month_names[month],
+                    'coupon_income': month_income,
+                    'maturities': month_maturities,
+                    'total_cash': total_cash,
+                    'is_historical': is_historical
+                })
+
+                year_total['coupon_income'] += month_income
+                year_total['maturities'] += month_maturities
+                year_total['total_cash'] += total_cash
+
+            account_results[year] = {
+                'months': year_data,
+                'total': year_total
+            }
+
+        results_by_account[account_name] = account_results
+
+    # Get last sync
+    last_sync = db.query(SyncLog).filter(
+        SyncLog.status == 'success'
+    ).order_by(SyncLog.completed_at.desc()).first()
+
+    return templates.TemplateResponse("results.html", {
         "request": request,
-        "projections": projections,
-        "month_names": month_names,
+        "results_by_account": results_by_account,
+        "years": years,
+        "current_month": today.month,
+        "current_year": current_year,
+        "last_sync": last_sync,
         "now": datetime.now()
     })
+
+
+# Keep /projections as redirect for backwards compatibility
+@app.get("/projections", response_class=HTMLResponse)
+async def projections_redirect(request: Request):
+    """Redirect old projections URL to results."""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/results", status_code=301)
 
 
 @app.get("/health")
