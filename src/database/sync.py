@@ -17,6 +17,19 @@ from .models import (
     MonthlyProjection, SyncLog
 )
 
+
+def get_issuer_from_cusip(cusip: str, original_issuer: str) -> str:
+    """Get issuer name from CUSIP if original is Unknown."""
+    if original_issuer and original_issuer != "Unknown":
+        return original_issuer
+
+    # US Treasury securities start with 912
+    if cusip.startswith("912"):
+        return "US TREASURY"
+
+    # Could add more CUSIP prefix lookups here
+    return original_issuer
+
 CACHE_DIR = Path.home() / ".cache" / "financial-management"
 
 
@@ -95,7 +108,7 @@ def sync_bond_holdings() -> int:
 
             holding = BondHolding(
                 cusip=h['cusip'],
-                issuer=h.get('issuer', 'Unknown'),
+                issuer=get_issuer_from_cusip(h['cusip'], h.get('issuer', 'Unknown')),
                 coupon_rate=h['coupon_rate'],
                 maturity_date=maturity,
                 face_value=h['face_value'],

@@ -157,6 +157,9 @@ def extract_bonds(page: Page) -> list[BondHolding]:
     """Extract bond holdings from positions page using DOM inspection."""
     holdings = []
 
+    # Known account numbers to exclude (not bonds)
+    KNOWN_ACCOUNT_NUMBERS = {'236772217', '245043311', 'Z24348867'}
+
     # Scroll to load all content
     for _ in range(3):
         page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
@@ -174,13 +177,22 @@ def extract_bonds(page: Page) -> list[BondHolding]:
     while i < len(lines):
         line = lines[i].strip()
 
-        # Check for account headers
-        if "Joint WROS - TOD" in line and "Z" in line:
-            current_account = "Joint WROS - TOD"
-        elif "John's IRA" in line:
-            current_account = "John's IRA"
-        elif "Mary's IRA" in line:
-            current_account = "Mary's IRA"
+        # Check for account headers - look for "Account:" followed by account name
+        # Format is like "Account: \nJoint WROS - TODZ24348867" or "Mary's IRA245043311"
+        if "Account:" in line:
+            # Look at next few lines for account name
+            for j in range(1, 4):
+                if i + j < len(lines):
+                    next_line = lines[i + j].strip()
+                    if "Joint WROS" in next_line:
+                        current_account = "Joint WROS - TOD"
+                        break
+                    elif "John's IRA" in next_line:
+                        current_account = "John's IRA"
+                        break
+                    elif "Mary's IRA" in next_line:
+                        current_account = "Mary's IRA"
+                        break
 
         # Look for CUSIP pattern - 9 alphanumeric chars, typically starts with digits
         # Examples: 00440EAC1, 054536AA5, 912810EW4
@@ -188,6 +200,11 @@ def extract_bonds(page: Page) -> list[BondHolding]:
 
         if cusip_match and len(line) == 9:
             cusip = cusip_match.group(1)
+
+            # Skip known account numbers
+            if cusip in KNOWN_ACCOUNT_NUMBERS:
+                i += 1
+                continue
 
             # Look ahead for bond data (next 15-20 lines)
             context_lines = lines[i:i+20]
@@ -205,9 +222,14 @@ def extract_bonds(page: Page) -> list[BondHolding]:
             for ctx_line in context_lines[1:10]:
                 ctx_line = ctx_line.strip()
                 # Look for lines containing company names (all caps with BOND/CORP/INC etc)
-                if re.search(r'(BOND|CORP|INC|CO\b|LLC|FIN|NOTE|CAP)', ctx_line, re.IGNORECASE):
+                # Also match US Treasury patterns
+                if re.search(r'(BOND|CORP|INC|CO\b|LLC|FIN|NOTE|CAP|TREAS)', ctx_line, re.IGNORECASE):
                     issuer = ctx_line[:50]
                     break
+
+            # If still unknown but CUSIP starts with 912, it's a US Treasury
+            if issuer == "Unknown" and cusip.startswith("912"):
+                issuer = "US TREASURY"
 
             # Find quantity (face value) - look for a standalone number like "21,000"
             # It appears after the price data
@@ -245,10 +267,11 @@ def extract_bonds(page: Page) -> list[BondHolding]:
                     account=current_account
                 )
 
-                # Avoid duplicates
-                if not any(h.cusip == cusip for h in holdings):
+                # Allow same CUSIP in different accounts (same bond held in multiple accounts)
+                # Only avoid exact duplicates (same CUSIP AND same account)
+                if not any(h.cusip == cusip and h.account == current_account for h in holdings):
                     holdings.append(holding)
-                    print(f"  {cusip}: {issuer[:30]:<30} {coupon_rate*100:5.2f}% {maturity} ${face_value:>10,.0f}")
+                    print(f"  {cusip}: {issuer[:30]:<30} {coupon_rate*100:5.2f}% {maturity} ${face_value:>10,.0f} [{current_account}]")
 
         i += 1
 
