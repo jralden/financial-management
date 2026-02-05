@@ -142,20 +142,47 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
         ((MonthlyProjection.year == today.year) & (MonthlyProjection.month >= today.month))
     ).order_by(MonthlyProjection.year, MonthlyProjection.month).limit(12).all()
 
-    # Calculate next month cash per account (from bond holdings)
+    # Calculate next month and 12-month cash per account (from bond holdings)
     next_month = today.month + 1 if today.month < 12 else 1
     next_month_year = today.year if today.month < 12 else today.year + 1
-    next_month_cash_by_account = {}
+
+    account_summaries = {}
     for account_name, data in bonds_by_account.items():
-        account_cash = 0
+        next_month_cash = 0
+        twelve_month_cash = 0
+
         for bond in data['bonds']:
-            # Check for coupon payment
+            # Check for next month
             if bond.payment_month_1 == next_month or bond.payment_month_2 == next_month:
-                account_cash += (bond.face_value * bond.coupon_rate) / 2
-            # Check for maturity
+                next_month_cash += (bond.face_value * bond.coupon_rate) / 2
             if bond.maturity_date.year == next_month_year and bond.maturity_date.month == next_month:
-                account_cash += bond.face_value
-        next_month_cash_by_account[account_name] = account_cash
+                next_month_cash += bond.face_value
+
+            # Calculate 12-month total
+            for i in range(12):
+                check_month = (today.month + i) % 12 + 1
+                check_year = today.year + (today.month + i) // 12
+
+                # Skip if bond already matured
+                if (bond.maturity_date.year < check_year or
+                    (bond.maturity_date.year == check_year and bond.maturity_date.month < check_month)):
+                    continue
+
+                # Coupon payment
+                if bond.payment_month_1 == check_month or bond.payment_month_2 == check_month:
+                    twelve_month_cash += (bond.face_value * bond.coupon_rate) / 2
+
+                # Maturity
+                if bond.maturity_date.year == check_year and bond.maturity_date.month == check_month:
+                    twelve_month_cash += bond.face_value
+
+        account_summaries[account_name] = {
+            'next_month_cash': next_month_cash,
+            'twelve_month_cash': twelve_month_cash,
+            'bond_count': data['count'],
+            'face_value': data['face_value'],
+            'annual_income': data['annual_income']
+        }
 
     # Get last sync
     last_sync = db.query(SyncLog).filter(
@@ -165,14 +192,23 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
     month_names = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
+    # Calculate totals across all accounts
+    total_next_month = sum(s['next_month_cash'] for s in account_summaries.values())
+    total_twelve_month = sum(s['twelve_month_cash'] for s in account_summaries.values())
+    total_bonds = sum(s['bond_count'] for s in account_summaries.values())
+    total_face_value = sum(s['face_value'] for s in account_summaries.values())
+
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "balances": balances,
         "total_balance": total_balance,
         "total_change": total_change,
         "bonds_by_account": bonds_by_account,
-        "projections": projections,
-        "next_month_cash_by_account": next_month_cash_by_account,
+        "account_summaries": account_summaries,
+        "total_next_month": total_next_month,
+        "total_twelve_month": total_twelve_month,
+        "total_bonds": total_bonds,
+        "total_face_value": total_face_value,
         "next_month_name": f"{month_names[next_month]} {next_month_year}",
         "last_sync": last_sync,
         "now": datetime.now()
