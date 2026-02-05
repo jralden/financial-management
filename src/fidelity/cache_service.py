@@ -133,15 +133,12 @@ def log(message: str):
 
 
 def send_notification(title: str, message: str, sound: bool = True):
-    """Send a macOS notification using osascript."""
+    """Send a macOS notification using terminal-notifier."""
     try:
-        sound_part = 'sound name "Basso"' if sound else ""
-        script = f'display notification "{message}" with title "{title}" {sound_part}'
-        subprocess.run(
-            ["osascript", "-e", script],
-            capture_output=True,
-            timeout=5
-        )
+        cmd = ["terminal-notifier", "-title", title, "-message", message]
+        if sound:
+            cmd.extend(["-sound", "Basso"])
+        subprocess.run(cmd, capture_output=True, timeout=5)
         log(f"NOTIFICATION: {title} - {message}")
     except Exception as e:
         log(f"WARNING: Could not send notification: {e}")
