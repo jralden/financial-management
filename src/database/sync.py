@@ -36,6 +36,7 @@ CACHE_DIR = Path.home() / ".cache" / "financial-management"
 def sync_balances() -> int:
     """Sync account balances from local cache to database."""
     cache_file = CACHE_DIR / "fidelity_balances.json"
+    bonds_file = CACHE_DIR / "bond_holdings.json"
 
     if not cache_file.exists():
         print("No balances cache found")
@@ -43,6 +44,13 @@ def sync_balances() -> int:
 
     with open(cache_file) as f:
         data = json.load(f)
+
+    # Load cash data from bond holdings file
+    cash_by_account = {}
+    if bonds_file.exists():
+        with open(bonds_file) as f:
+            bonds_data = json.load(f)
+            cash_by_account = bonds_data.get('cash_by_account', {})
 
     session = get_session()
 
@@ -55,11 +63,13 @@ def sync_balances() -> int:
 
         count = 0
         for acc in data.get('accounts', []):
+            account_name = acc.get('name', 'Unknown')
             balance = AccountBalance(
                 account_number=acc.get('account_number', 'unknown'),
-                account_name=acc.get('name', 'Unknown'),
+                account_name=account_name,
                 account_type=acc.get('account_type', 'Unknown'),
                 balance=acc.get('balance', 0),
+                cash_balance=cash_by_account.get(account_name, 0),
                 daily_change=acc.get('daily_change', 0),
                 daily_change_percent=acc.get('daily_change_percent', 0),
                 as_of=timestamp
@@ -68,7 +78,7 @@ def sync_balances() -> int:
             count += 1
 
         session.commit()
-        print(f"Synced {count} account balances")
+        print(f"Synced {count} account balances (with cash data)")
         return count
 
     except Exception as e:

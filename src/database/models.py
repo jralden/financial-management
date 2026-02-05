@@ -25,6 +25,7 @@ class AccountBalance(Base):
     account_name = Column(String(100), nullable=False)
     account_type = Column(String(50))  # Investment, Retirement, Authorized
     balance = Column(Float, nullable=False)
+    cash_balance = Column(Float, default=0)  # Uninvested cash (money market, etc.)
     daily_change = Column(Float, default=0)
     daily_change_percent = Column(Float, default=0)
     as_of = Column(DateTime, nullable=False)

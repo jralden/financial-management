@@ -205,17 +205,21 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
             'balance': balance.balance,
             'daily_change': balance.daily_change,
             'daily_change_percent': balance.daily_change_percent,
+            'cash_balance': balance.cash_balance or 0,
             'bond_count': summary.get('bond_count', 0),
             'face_value': summary.get('face_value', 0),
             'next_month_income': summary.get('next_month_income', 0),
             'twelve_month_income': summary.get('twelve_month_income', 0),
         })
 
+    total_cash_balance = sum(a['cash_balance'] for a in combined_accounts)
+
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "combined_accounts": combined_accounts,
         "total_balance": total_balance,
         "total_change": total_change,
+        "total_cash_balance": total_cash_balance,
         "bonds_by_account": bonds_by_account,
         "total_next_month_income": total_next_month_income,
         "total_twelve_month_income": total_twelve_month_income,

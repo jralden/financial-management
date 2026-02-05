@@ -153,9 +153,10 @@ def login(page: Page) -> bool:
     return "login" not in page.url.lower()
 
 
-def extract_bonds(page: Page) -> list[BondHolding]:
-    """Extract bond holdings from positions page using DOM inspection."""
+def extract_bonds_and_cash(page: Page) -> tuple[list[BondHolding], dict[str, float]]:
+    """Extract bond holdings and cash balances from positions page."""
     holdings = []
+    cash_by_account = {}
 
     # Known account numbers to exclude (not bonds)
     KNOWN_ACCOUNT_NUMBERS = {'236772217', '245043311', 'Z24348867'}
@@ -192,6 +193,20 @@ def extract_bonds(page: Page) -> list[BondHolding]:
                         break
                     elif "Mary's IRA" in next_line:
                         current_account = "Mary's IRA"
+                        break
+
+        # Extract cash balance - look for "Cash" followed by "HELD IN" and a dollar amount
+        if line == "Cash" and current_account != "Unknown":
+            # Look ahead for the cash amount
+            for j in range(1, 6):
+                if i + j < len(lines):
+                    cash_line = lines[i + j].strip()
+                    # Match dollar amount like "$24,003.66" or "$8.05"
+                    cash_match = re.match(r'^\$(\d{1,3}(?:,\d{3})*\.?\d*)$', cash_line)
+                    if cash_match:
+                        cash_value = float(cash_match.group(1).replace(',', ''))
+                        cash_by_account[current_account] = cash_value
+                        print(f"  Cash [{current_account}]: ${cash_value:,.2f}")
                         break
 
         # Look for CUSIP pattern - 9 alphanumeric chars, typically starts with digits
@@ -275,10 +290,10 @@ def extract_bonds(page: Page) -> list[BondHolding]:
 
         i += 1
 
-    return holdings
+    return holdings, cash_by_account
 
 
-def fetch_bond_holdings(headless: bool = True) -> Optional[BondPortfolio]:
+def fetch_bond_holdings(headless: bool = True) -> Optional[tuple[BondPortfolio, dict[str, float]]]:
     """Fetch all bond holdings from Fidelity."""
     import time
     start_time = time.time()
@@ -305,8 +320,8 @@ def fetch_bond_holdings(headless: bool = True) -> Optional[BondPortfolio]:
 
             page.screenshot(path="positions_debug.png")
 
-            print("\nExtracting bond holdings...")
-            holdings = extract_bonds(page)
+            print("\nExtracting bond holdings and cash...")
+            holdings, cash_by_account = extract_bonds_and_cash(page)
 
             print(f"\nFound {len(holdings)} bonds")
 
@@ -316,7 +331,7 @@ def fetch_bond_holdings(headless: bool = True) -> Optional[BondPortfolio]:
                 fetch_time_seconds=time.time() - start_time
             )
 
-            return portfolio
+            return portfolio, cash_by_account
 
         except Exception as e:
             print(f"Error: {e}")
@@ -327,7 +342,7 @@ def fetch_bond_holdings(headless: bool = True) -> Optional[BondPortfolio]:
             context.close()
 
 
-def save_portfolio(portfolio: BondPortfolio):
+def save_portfolio(portfolio: BondPortfolio, cash_by_account: dict[str, float] = None):
     """Save portfolio to cache."""
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -343,12 +358,14 @@ def save_portfolio(portfolio: BondPortfolio):
             }
             for h in portfolio.holdings
         ],
+        "cash_by_account": cash_by_account or {},
         "summary": {
             "total_face_value": portfolio.total_face_value(),
             "total_current_value": portfolio.total_current_value(),
             "total_annual_income": portfolio.total_annual_income(),
             "income_by_year": portfolio.income_by_year(),
             "bond_count": len(portfolio.holdings),
+            "total_cash": sum((cash_by_account or {}).values()),
         }
     }
 
@@ -404,13 +421,24 @@ def main():
 
     print(f"Fetching bond holdings ({'headless' if headless else 'headed'} mode)...")
 
-    portfolio = fetch_bond_holdings(headless=headless)
+    result = fetch_bond_holdings(headless=headless)
 
-    if portfolio and portfolio.holdings:
-        print_income_projection(portfolio)
-        save_portfolio(portfolio)
+    if result:
+        portfolio, cash_by_account = result
+        if portfolio.holdings:
+            print_income_projection(portfolio)
+            if cash_by_account:
+                print(f"\nCash by Account:")
+                print("-"*40)
+                for account, cash in cash_by_account.items():
+                    print(f"  {account:<20} ${cash:>12,.2f}")
+                print(f"  {'Total':<20} ${sum(cash_by_account.values()):>12,.2f}")
+            save_portfolio(portfolio, cash_by_account)
+        else:
+            print("No bonds found")
+            sys.exit(1)
     else:
-        print("Failed to fetch bond holdings or no bonds found")
+        print("Failed to fetch bond holdings")
         sys.exit(1)
 
 
