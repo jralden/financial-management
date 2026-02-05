@@ -90,21 +90,12 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for year in years %}
-                    {% set year_coupon = 0 %}
-                    {% set year_maturities = 0 %}
-                    {% set year_total = 0 %}
-                    {% for account_name, account_years in results_by_account.items() %}
-                        {% if account_years.get(year) %}
-                            {% set year_coupon = year_coupon + account_years[year].total.coupon_income %}
-                            {% set year_maturities = year_maturities + account_years[year].total.maturities %}
-                            {% set year_total = year_total + account_years[year].total.total_cash %}
-                        {% endif %}
-                    {% endfor %}
+                    {% set totals = grand_totals_by_year.get(year, {}) %}
                     <tr>
                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ year }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">${{ "{:,.2f}".format(year_coupon) }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-yellow-600">${{ "{:,.2f}".format(year_maturities) }}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-green-600">${{ "{:,.2f}".format(year_total) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">${{ "{:,.2f}".format(totals.get('coupon_income', 0)) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-yellow-600">${{ "{:,.2f}".format(totals.get('maturities', 0)) }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-medium text-green-600">${{ "{:,.2f}".format(totals.get('total_cash', 0)) }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>

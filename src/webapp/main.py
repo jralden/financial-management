@@ -306,11 +306,30 @@ async def holdings_page(request: Request, db: Session = Depends(get_db)):
     """Bond holdings page."""
     holdings = db.query(BondHolding).order_by(BondHolding.maturity_date).all()
 
+    # Group holdings by account in specified order
+    holdings_by_account = {}
+    for account_name in ACCOUNT_ORDER.keys():
+        account_bonds = [h for h in holdings if h.account == account_name]
+        if account_bonds:
+            holdings_by_account[account_name] = {
+                'bonds': account_bonds,
+                'count': len(account_bonds),
+                'face_value': sum(h.face_value for h in account_bonds),
+                'annual_income': sum(h.face_value * h.coupon_rate for h in account_bonds)
+            }
+
+    # Get last sync
+    last_sync = db.query(SyncLog).filter(
+        SyncLog.status == 'success'
+    ).order_by(SyncLog.completed_at.desc()).first()
+
     return templates.TemplateResponse("holdings.html", {
         "request": request,
-        "holdings": holdings,
+        "holdings_by_account": holdings_by_account,
         "total_face_value": sum(h.face_value for h in holdings),
         "total_annual_income": sum(h.face_value * h.coupon_rate for h in holdings),
+        "total_count": len(holdings),
+        "last_sync": last_sync,
         "now": datetime.now()
     })
 
@@ -386,6 +405,17 @@ async def results_page(request: Request, db: Session = Depends(get_db)):
 
         results_by_account[account_name] = account_results
 
+    # Calculate grand totals by year (across all accounts)
+    grand_totals_by_year = {}
+    for year in years:
+        year_totals = {'coupon_income': 0, 'maturities': 0, 'total_cash': 0}
+        for account_name, account_years in results_by_account.items():
+            if year in account_years:
+                year_totals['coupon_income'] += account_years[year]['total']['coupon_income']
+                year_totals['maturities'] += account_years[year]['total']['maturities']
+                year_totals['total_cash'] += account_years[year]['total']['total_cash']
+        grand_totals_by_year[year] = year_totals
+
     # Get last sync
     last_sync = db.query(SyncLog).filter(
         SyncLog.status == 'success'
@@ -395,6 +425,7 @@ async def results_page(request: Request, db: Session = Depends(get_db)):
         "request": request,
         "results_by_account": results_by_account,
         "years": years,
+        "grand_totals_by_year": grand_totals_by_year,
         "current_month": today.month,
         "current_year": current_year,
         "last_sync": last_sync,

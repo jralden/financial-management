@@ -8,7 +8,7 @@
     <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <div class="bg-white overflow-hidden shadow rounded-lg p-5">
             <dt class="text-sm font-medium text-gray-500">Total Holdings</dt>
-            <dd class="text-2xl font-semibold text-gray-900">{{ holdings|length }} bonds</dd>
+            <dd class="text-2xl font-semibold text-gray-900">{{ total_count }} bonds</dd>
         </div>
         <div class="bg-white overflow-hidden shadow rounded-lg p-5">
             <dt class="text-sm font-medium text-gray-500">Total Face Value</dt>
@@ -20,11 +20,16 @@
         </div>
     </div>
 
-    <!-- Holdings Table -->
+    <!-- Holdings by Account -->
+    {% set month_abbr = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
+
+    {% for account_name, account_data in holdings_by_account.items() %}
     <div class="bg-white shadow rounded-lg">
-        <div class="px-4 py-5 sm:px-6 border-b">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Bond Holdings</h3>
-            <p class="mt-1 text-sm text-gray-500">Sorted by maturity date</p>
+        <div class="px-4 py-5 sm:px-6 border-b bg-gray-50">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">{{ account_name }}</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                {{ account_data.count }} bonds | ${{ "{:,.0f}".format(account_data.face_value) }} face value | ${{ "{:,.2f}".format(account_data.annual_income) }}/year
+            </p>
         </div>
         <div class="overflow-x-auto">
             <table class="min-w-full divide-y divide-gray-200">
@@ -36,28 +41,25 @@
                         <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Maturity</th>
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Face Value</th>
                         <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Annual Income</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Account</th>
                         <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pays</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    {% set month_abbr = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'] %}
-                    {% for h in holdings %}
+                    {% for h in account_data.bonds %}
                     {% set annual_income = h.face_value * h.coupon_rate %}
                     {% set days_to_maturity = (h.maturity_date - now.date()).days %}
                     <tr class="{% if days_to_maturity < 180 %}bg-yellow-50{% elif days_to_maturity < 365 %}bg-orange-50{% endif %}">
                         <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">{{ h.cusip }}</td>
-                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="{{ h.issuer }}">{{ h.issuer[:30] }}</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="{{ h.issuer }}">{{ h.issuer[:35] }}{% if h.issuer|length > 35 %}...{% endif %}</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">{{ "{:.2f}".format(h.coupon_rate * 100) }}%</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                            {{ h.maturity_date.strftime('%Y-%m-%d') }}
+                            {{ h.maturity_date.strftime('%m/%d/%Y') }}
                             {% if days_to_maturity < 180 %}
                             <span class="ml-1 text-yellow-600 text-xs">({{ days_to_maturity }}d)</span>
                             {% endif %}
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">${{ "{:,.0f}".format(h.face_value) }}</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">${{ "{:,.2f}".format(annual_income) }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-500">{{ h.account[:15] }}</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
                             {{ month_abbr[h.payment_month_1] }}/{{ month_abbr[h.payment_month_2] }}
                             {% if not h.payment_verified %}<span class="text-yellow-500">?</span>{% endif %}
@@ -65,8 +67,17 @@
                     </tr>
                     {% endfor %}
                 </tbody>
+                <tfoot class="bg-gray-100">
+                    <tr>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900" colspan="4">Account Total</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-gray-900">${{ "{:,.0f}".format(account_data.face_value) }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-green-600">${{ "{:,.2f}".format(account_data.annual_income) }}</td>
+                        <td class="px-4 py-3"></td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
     </div>
+    {% endfor %}
 </div>
 {% endblock %}
