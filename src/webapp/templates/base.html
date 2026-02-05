@@ -44,8 +44,11 @@
                     </div>
                 </div>
                 <div class="flex items-center text-sm text-gray-500">
-                    {% if last_sync %}
-                    Last sync: {{ last_sync.completed_at.strftime('%Y-%m-%d %H:%M') if last_sync.completed_at else 'Unknown' }}
+                    {% if last_fetch %}
+                    <span class="{% if is_stale %}text-red-500 font-medium{% endif %}">
+                        Last fetch: {{ last_fetch.strftime('%I:%M %p') }} ET
+                        {% if is_stale %}(STALE){% endif %}
+                    </span>
                     {% endif %}
                 </div>
             </div>

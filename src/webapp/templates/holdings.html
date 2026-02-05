@@ -46,7 +46,6 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     {% for h in account_data.bonds %}
-                    {% set annual_income = h.face_value * h.coupon_rate %}
                     {% set days_to_maturity = (h.maturity_date - now.date()).days %}
                     <tr class="{% if days_to_maturity < 180 %}bg-yellow-50{% elif days_to_maturity < 365 %}bg-orange-50{% endif %}">
                         <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">{{ h.cusip }}</td>
@@ -59,10 +58,9 @@
                             {% endif %}
                         </td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">${{ "{:,.0f}".format(h.face_value) }}</td>
-                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">${{ "{:,.2f}".format(annual_income) }}</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">${{ "{:,.2f}".format(h.annual_income) }}</td>
                         <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
                             {{ month_abbr[h.payment_month_1] }}/{{ month_abbr[h.payment_month_2] }}
-                            {% if not h.payment_verified %}<span class="text-yellow-500">?</span>{% endif %}
                         </td>
                     </tr>
                     {% endfor %}
