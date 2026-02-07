@@ -122,7 +122,7 @@ def extract_balances(page: Page) -> Optional[PortfolioSummary]:
     if all_accounts_match:
         total_balance = parse_dollar_amount(all_accounts_match.group(1))
 
-    gain_loss_match = re.search(r'(-?\$[\d,]+\.?\d*)\s*\((-?[\d.]+)%\)\s*Today', body_text)
+    gain_loss_match = re.search(r'([+-]?\$[\d,]+\.?\d*)\s*\(([+-]?[\d.]+)%\)\s*Today', body_text)
     if gain_loss_match:
         total_change = parse_dollar_amount(gain_loss_match.group(1))
         total_change_pct = parse_percent(gain_loss_match.group(2))
@@ -147,7 +147,7 @@ def extract_balances(page: Page) -> Optional[PortfolioSummary]:
         account_match = re.search(
             r'([\w\s\'-]+?)\s*[\(\s]*([A-Z]?\d{5,})[\)\s]*'
             r'.*?balance:\s*\$([\d,]+\.?\d*)'
-            r'.*?gains/losses:\s*(-?\$?[\d,]+\.?\d*)\s*\((-?[\d.]+)%\)',
+            r'.*?gains/losses:\s*([+-]?\$?[\d,]+\.?\d*)\s*\(([+-]?[\d.]+)%\)',
             text,
             re.IGNORECASE
         )
