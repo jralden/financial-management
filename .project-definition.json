@@ -1,0 +1,23 @@
+{
+  "schema-version": "1.0.0",
+  "project-type": "code-development",
+  "scale": "prototype",
+  "sdm": "durt",
+  "project": {
+    "id": "7B62041C-000B-4A53-8EB8-1A8B5BC52C9E",
+    "description": "Web application for financial portfolio management and tracking.",
+    "tags": [
+      "finance",
+      "webapp"
+    ]
+  },
+  "status": {
+    "activity": "active"
+  },
+  "scaffolding": {
+    "git-init": true,
+    "copy-vscode-profile": false,
+    "seed-ai-context": true,
+    "include-test-framework": false
+  }
+}
