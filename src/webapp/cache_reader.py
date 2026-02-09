@@ -1,11 +1,12 @@
 """
-Cache reader for local scraper data.
+Cache reader for scraper data.
 
-Reads from the local cache files instead of the database.
-This decouples the dashboard from the Railway database.
+Reads from Backblaze B2 if B2_BUCKET_NAME is set, otherwise
+falls back to local cache files at ~/.cache/financial-management/.
 """
 
 import json
+import os
 from datetime import datetime, date
 from pathlib import Path
 from typing import Optional
@@ -17,6 +18,27 @@ BALANCES_FILE = CACHE_DIR / "fidelity_balances.json"
 BONDS_FILE = CACHE_DIR / "bond_holdings.json"
 
 ET_TZ = ZoneInfo("America/New_York")
+
+
+def _read_json(local_path: Path, filename: str) -> Optional[dict]:
+    """Read JSON from B2 if configured, otherwise from local filesystem."""
+    bucket = os.environ.get("B2_BUCKET_NAME")
+    if bucket:
+        import boto3
+        s3 = boto3.client(
+            "s3",
+            endpoint_url=os.environ["B2_ENDPOINT_URL"],
+            aws_access_key_id=os.environ["B2_ACCESS_KEY_ID"],
+            aws_secret_access_key=os.environ["B2_SECRET_ACCESS_KEY"],
+        )
+        obj = s3.get_object(Bucket=bucket, Key=filename)
+        return json.loads(obj["Body"].read())
+
+    if not local_path.exists():
+        return None
+    with open(local_path) as f:
+        return json.load(f)
+
 
 # Account ordering
 ACCOUNT_ORDER = {
@@ -73,19 +95,16 @@ def load_balances() -> tuple[list[AccountBalance], float, float, Optional[dateti
     Returns:
         (accounts, total_balance, total_change, timestamp)
     """
-    if not BALANCES_FILE.exists():
-        return [], 0.0, 0.0, None
-
     try:
-        with open(BALANCES_FILE) as f:
-            data = json.load(f)
+        data = _read_json(BALANCES_FILE, "fidelity_balances.json")
+        if data is None:
+            return [], 0.0, 0.0, None
 
         # Load cash data from bonds file if available
         cash_by_account = {}
-        if BONDS_FILE.exists():
-            with open(BONDS_FILE) as f:
-                bonds_data = json.load(f)
-                cash_by_account = bonds_data.get('cash_by_account', {})
+        bonds_data = _read_json(BONDS_FILE, "bond_holdings.json")
+        if bonds_data:
+            cash_by_account = bonds_data.get('cash_by_account', {})
 
         accounts = []
         for acc in data.get('accounts', []):
@@ -123,12 +142,10 @@ def load_bond_holdings() -> tuple[list[BondHolding], Optional[datetime]]:
     Returns:
         (holdings, timestamp)
     """
-    if not BONDS_FILE.exists():
-        return [], None
-
     try:
-        with open(BONDS_FILE) as f:
-            data = json.load(f)
+        data = _read_json(BONDS_FILE, "bond_holdings.json")
+        if data is None:
+            return [], None
 
         holdings = []
         for h in data.get('holdings', []):
