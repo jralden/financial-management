@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond Holdings - Financial Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af',
+                        secondary: '#64748b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .money-positive { color: #16a34a; }
+        .money-negative { color: #dc2626; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="holdings.html" class="text-xl font-bold text-primary">Financial Management</a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="holdings.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Holdings
+                        </a>
+                        <a href="results.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Results
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm text-gray-500">
+                    
+                    <span>Data from: February 17, 2026</span>
+                    
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        
+<div class="space-y-6">
+    <!-- Summary -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-3">
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">Total Holdings</dt>
+            <dd class="text-2xl font-semibold text-gray-900">25 bonds</dd>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">Total Face Value</dt>
+            <dd class="text-2xl font-semibold text-gray-900">$1,793,000</dd>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">Annual Income</dt>
+            <dd class="text-2xl font-semibold text-gray-900">$120,239.40</dd>
+        </div>
+    </div>
+
+    <!-- Holdings by Account -->
+    
+
+    
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6 border-b bg-gray-50">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Joint WROS - TOD</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                15 bonds | $1,186,000 face value | $73,595.15/year
+            </p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CUSIP</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issuer</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Coupon</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Maturity</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Face Value</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Annual Income</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pays</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    
+                    
+                    <tr class="bg-yellow-50">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">91282CKS9</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="UNITED STATES TREAS SER BC-2026 4.87500% 05/31/202">UNITED STATES TREAS SER BC-2026 4.8...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">4.88%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            05/31/2026
+                            
+                            <span class="ml-1 text-yellow-600 text-xs">(103d)</span>
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$200,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$9,750.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            May/Nov
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">91282CKJ9</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="UNITED STATES TREAS SER AM-2027 4.50000% 04/15/202">UNITED STATES TREAS SER AM-2027 4.5...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">4.50%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            04/15/2027
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$200,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$9,000.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Apr/Oct
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">377372AN7</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="GLAXOSMITHKLINE CAP INC NOTE 3.87500% 05/15/2028 C">GLAXOSMITHKLINE CAP INC NOTE 3.8750...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">3.88%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            05/15/2028
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$30,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$1,162.50</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            May/Nov
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">438506AS6</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="HONEYWELL INTL INC BOND 6.62500% 06/15/2028">HONEYWELL INTL INC BOND 6.62500% 06...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">6.62%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            06/15/2028
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$50,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$3,312.50</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Jun/Dec
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">338915AM3</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="BANK AMERICA CORP BOND 6.70000% 07/15/2028">BANK AMERICA CORP BOND 6.70000% 07/...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">6.70%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            07/15/2028
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$50,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$3,350.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Jan/Jul
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">418056AH0</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="HASBRO INC BOND 6.60000% 07/15/2028">HASBRO INC BOND 6.60000% 07/15/2028</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">6.60%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            07/15/2028
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$50,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$3,300.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Jan/Jul
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">892331AD1</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="TOYOTA MOTOR CORP NOTE 3.66900% 07/20/2028 ISIN #U">TOYOTA MOTOR CORP NOTE 3.66900% 07/...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">3.67%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            07/20/2028
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$50,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$1,834.50</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Jan/Jul
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">129466AM0</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="BERKSHIRE HATHAWAY ENERGY CO BOND 8.48000% 09/15/2">BERKSHIRE HATHAWAY ENERGY CO BOND 8...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.48%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            09/15/2028
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$150,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$12,720.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Mar/Sep
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">437076BW1</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="HOME DEPOT INC NOTE CALL MAKE WHOLE 3.90000% 12/06">HOME DEPOT INC NOTE CALL MAKE WHOLE...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">3.90%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            12/06/2028
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$50,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$1,950.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Jun/Dec
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">00440EAC1</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="CHUBB INA HLDGS INC BOND 8.87500% 08/15/2029">CHUBB INA HLDGS INC BOND 8.87500% 0...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.88%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            08/15/2029
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$21,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$1,863.75</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Feb/Aug
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">448814DC4</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="HYDRO-QUEBEC BOND 8.50000% 12/01/2029">HYDRO-QUEBEC BOND 8.50000% 12/01/20...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.50%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            12/01/2029
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$10,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$850.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Jun/Dec
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">054536AA5</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="AXA SA BOND 8.60000% 12/15/2030 ISIN #US054536AA57">AXA SA BOND 8.60000% 12/15/2030 ISI...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.60%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            12/15/2030
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$50,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$4,300.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Jun/Dec
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">233835AQ0</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="MERCEDES-BENZ FIN NORTH AMER NOTE 8.50000% 01/18/2">MERCEDES-BENZ FIN NORTH AMER NOTE 8...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.50%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            01/18/2031
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$45,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$3,825.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Jan/Jul
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">373298BU1</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="GEORGIA PAC CORP NOTE CALL MAKE WHOLE 8.87500% 05/">GEORGIA PAC CORP NOTE CALL MAKE WHO...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.88%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            05/15/2031
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$50,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$4,437.50</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            May/Nov
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">89832QAD1</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="TRUIST FINL CORP ALT TIER I PERP BOND 6.63300%">TRUIST FINL CORP ALT TIER I PERP BO...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">6.63%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            12/31/2049
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$180,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$11,939.40</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Jun/Dec
+                        </td>
+                    </tr>
+                    
+                </tbody>
+                <tfoot class="bg-gray-100">
+                    <tr>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900" colspan="4">Account Total</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-gray-900">$1,186,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-green-600">$73,595.15</td>
+                        <td class="px-4 py-3"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6 border-b bg-gray-50">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Mary's IRA</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                4 bonds | $281,000 face value | $21,737.00/year
+            </p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CUSIP</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issuer</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Coupon</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Maturity</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Face Value</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Annual Income</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pays</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">075887AN9</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="BECTON DICKINSON &CO BOND 7.00000% 08/01/2027">BECTON DICKINSON &CO BOND 7.00000% ...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">7.00%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            08/01/2027
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$74,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$5,180.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Feb/Aug
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">254687DM5</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="DISNEY WALT CO SER B NOTE 7.12500% 04/08/2028">DISNEY WALT CO SER B NOTE 7.12500% ...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">7.12%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            04/08/2028
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$74,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$5,272.50</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Apr/Oct
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">00440EAC1</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="CHUBB INA HLDGS INC BOND 8.87500% 08/15/2029">CHUBB INA HLDGS INC BOND 8.87500% 0...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.88%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            08/15/2029
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$66,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$5,857.50</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Feb/Aug
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">244199AZ8</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="DEERE &CO BOND 8.10000% 05/15/2030">DEERE &CO BOND 8.10000% 05/15/2030</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.10%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            05/15/2030
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$67,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$5,427.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            May/Nov
+                        </td>
+                    </tr>
+                    
+                </tbody>
+                <tfoot class="bg-gray-100">
+                    <tr>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900" colspan="4">Account Total</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-gray-900">$281,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-green-600">$21,737.00</td>
+                        <td class="px-4 py-3"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    
+    <div class="bg-white shadow rounded-lg">
+        <div class="px-4 py-5 sm:px-6 border-b bg-gray-50">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">John's IRA</h3>
+            <p class="mt-1 text-sm text-gray-500">
+                6 bonds | $326,000 face value | $24,907.25/year
+            </p>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CUSIP</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Issuer</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Coupon</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Maturity</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Face Value</th>
+                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">Annual Income</th>
+                        <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Pays</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    
+                    
+                    <tr class="bg-yellow-50">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">91282CKB6</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="UNITED STATES TREAS SER AY-2026 4.62500% 02/28/202">UNITED STATES TREAS SER AY-2026 4.6...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">4.62%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            02/28/2026
+                            
+                            <span class="ml-1 text-yellow-600 text-xs">(11d)</span>
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$30,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$1,387.50</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Feb/Aug
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="bg-yellow-50">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">539830AF6</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="LOCKHEED MARTIN CORP BOND 7.75000% 05/01/2026">LOCKHEED MARTIN CORP BOND 7.75000% ...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">7.75%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            05/01/2026
+                            
+                            <span class="ml-1 text-yellow-600 text-xs">(73d)</span>
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$62,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$4,805.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            May/Nov
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">059438AK7</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="JPMORGAN CHASE &CO BOND 8.00000% 04/29/2027">JPMORGAN CHASE &CO BOND 8.00000% 04...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.00%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            04/29/2027
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$61,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$4,880.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Apr/Oct
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">254687DM5</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="DISNEY WALT CO SER B NOTE 7.12500% 04/08/2028">DISNEY WALT CO SER B NOTE 7.12500% ...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">7.12%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            04/08/2028
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$62,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$4,417.50</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Apr/Oct
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">00440EAC1</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="CHUBB INA HLDGS INC BOND 8.87500% 08/15/2029">CHUBB INA HLDGS INC BOND 8.87500% 0...</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.88%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            08/15/2029
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$55,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$4,881.25</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            Feb/Aug
+                        </td>
+                    </tr>
+                    
+                    
+                    <tr class="">
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-mono text-gray-900">244199AZ8</td>
+                        <td class="px-4 py-3 text-sm text-gray-900 max-w-xs truncate" title="DEERE &CO BOND 8.10000% 05/15/2030">DEERE &CO BOND 8.10000% 05/15/2030</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">8.10%</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
+                            05/15/2030
+                            
+                        </td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right text-gray-900">$56,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-green-600">$4,536.00</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-center text-gray-500">
+                            May/Nov
+                        </td>
+                    </tr>
+                    
+                </tbody>
+                <tfoot class="bg-gray-100">
+                    <tr>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm font-bold text-gray-900" colspan="4">Account Total</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-gray-900">$326,000</td>
+                        <td class="px-4 py-3 whitespace-nowrap text-sm text-right font-bold text-green-600">$24,907.25</td>
+                        <td class="px-4 py-3"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+    
+</div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-auto">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">
+                Financial Management System &copy; 2026
+            </p>
+        </div>
+    </footer>
+
+    
+</body>
+</html>
