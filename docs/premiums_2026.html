@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bond Premiums - Financial Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#1e40af',
+                        secondary: '#64748b',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .money-positive { color: #16a34a; }
+        .money-negative { color: #dc2626; }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+    <!-- Navigation -->
+    <nav class="bg-white shadow-sm border-b">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="holdings.html" class="text-xl font-bold text-primary">Financial Management</a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <a href="holdings.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Holdings
+                        </a>
+                        <a href="results.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Results
+                        </a>
+                        <a href="premiums.html" class="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Premiums
+                        </a>
+                    </div>
+                </div>
+                <div class="flex items-center text-sm text-gray-500">
+                    
+                    <span>Data from: March 09, 2026</span>
+                    
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+        
+<div class="space-y-6">
+    <!-- Year selector -->
+    <div class="flex items-center space-x-4">
+        <h2 class="text-2xl font-bold text-gray-900">Bond Premiums</h2>
+        <div class="flex space-x-2">
+            
+            <a href="premiums_2026.html"
+               class="px-3 py-1 rounded text-sm font-medium bg-primary text-white">
+                2026
+            </a>
+            
+        </div>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-4">
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">Maturities/Sales</dt>
+            <dd class="text-2xl font-semibold text-gray-900">0</dd>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">Total Face Value</dt>
+            <dd class="text-2xl font-semibold text-gray-900">$0</dd>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">Total Purchase Price</dt>
+            <dd class="text-2xl font-semibold text-gray-900">$0.00</dd>
+        </div>
+        <div class="bg-white overflow-hidden shadow rounded-lg p-5">
+            <dt class="text-sm font-medium text-gray-500">Total Premium Paid</dt>
+            <dd class="text-2xl font-semibold text-gray-900">
+                $0.00
+            </dd>
+        </div>
+    </div>
+
+    
+    <div class="bg-white shadow rounded-lg p-8 text-center text-gray-500">
+        <p class="text-lg">No bond transactions found for 2026.</p>
+        <p class="mt-2 text-sm">Run the transaction scraper to populate data:</p>
+        <code class="mt-2 block text-sm bg-gray-100 p-2 rounded">
+            cd ~/Documents/Development/Financial/Fidelity-Scraper<br>
+            .venv/bin/python -m src.fidelity.bond_transactions --year 2026
+        </code>
+    </div>
+    
+</div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white border-t mt-auto">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <p class="text-center text-sm text-gray-500">
+                Financial Management System &copy; 2026
+            </p>
+        </div>
+    </footer>
+
+    
+</body>
+</html>
